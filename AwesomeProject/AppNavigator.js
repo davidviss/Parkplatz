@@ -4,6 +4,7 @@ import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import WeekScreen from './WeekScreen';
 import ResultScreen from './ResultScreen';
+import AustragenScreen from './AustragenScreen'
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ const AppNavigator = () => (
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="Übersicht" component={ResultScreen}/>
     <Stack.Screen name="Countdown" component={WeekScreen} />
+    <Stack.Screen name="Austragen" component ={AustragenScreen}/>
   </Stack.Navigator>
 );
 

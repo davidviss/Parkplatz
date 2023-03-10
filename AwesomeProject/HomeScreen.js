@@ -55,6 +55,10 @@ const HomeScreen = () => {
     navigation.navigate("Übersicht");
     animateButton();
   }
+  const handlePressAustragen = () => {
+    navigation.navigate("Austragen");
+    animateButton();
+  }
 
   useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -111,7 +115,7 @@ const HomeScreen = () => {
           </Animated.View>
         </TouchableOpacity>
         <Text style={styles.title}>Freigeben/Eintragen</Text>
-        <TouchableOpacity style={styles.button} onPress={handlePress}>
+        <TouchableOpacity style={styles.button} onPress={handlePressAustragen}>
           <Animated.View
             style={[
               styles.animatedButton,

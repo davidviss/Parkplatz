@@ -9,6 +9,8 @@ import {
   ImageBackground,
   Alert,
 } from 'react-native';
+import firebase from 'firebase/app';
+import 'firebase/auth';
 
 import {useNavigation} from '@react-navigation/native';
 
@@ -38,16 +40,20 @@ const LoginScreen = () => {
 
   // function to handle the login process
   const handleLogin = () => {
-    // Perform login logic here, such as checking the username and password against a backend API
-    if (username === 'a' && password === 'p') {
-      // If the login is successful, navigate to the next screen
-      navigation.navigate('Home');
-    } else {
-      // If the login is unsuccessful, show an error message
-      Alert.alert('Error', 'Invalid username or password');
-    }
-    // animate the login button
-    animateButton();
+    firebase.auth().signInWithEmailAndPassword(email, password)
+  .then((userCredential) => {
+    // Signed in successfully
+    const user = userCredential.user;
+    navigation.navigate('Home');
+  })
+  .catch((error) => {
+    // Handle errors
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    Alert.alert('Error', 'Invalid username or password');
+  });
+  // animate the login button
+  animateButton();
   };
 
   return (

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, AsyncStorage,ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, ImageBackground } from 'react-native';
+import {useState, useEffect} from 'react';
 
 const getNextFridayNoon = () => {
   const now = new Date();
@@ -16,14 +16,14 @@ const ParkplatzAuswahl = () => {
   const [countdown, setCountdown] = useState(0); // Countdown in Sekunden
   const [selectedDays, setSelectedDays] = useState([]); // ausgewählte Tage
 
-    // Lädt die ausgewählten Tage aus AsyncStorage beim Starten der App
-    useEffect(() => {
-      AsyncStorage.getItem('selectedDays').then((data) => {
-        if (data) {
-          setSelectedDays(JSON.parse(data));
-        }
-      });
-    }, []);
+  // Lädt die ausgewählten Tage aus AsyncStorage beim Starten der App
+  useEffect(() => {
+    AsyncStorage.getItem('selectedDays').then((data) => {
+      if (data) {
+        setSelectedDays(JSON.parse(data));
+      }
+    });
+  }, []);
 
   // Aktualisiert den Countdown in Sekunden
   useEffect(() => {
@@ -36,107 +36,87 @@ const ParkplatzAuswahl = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-// Aktualisiert die ausgewählten Tage und speichert sie in AsyncStorage
-const handleDayPress = (day) => {
-  if (selectedDays.includes(day)) {
-    setSelectedDays(selectedDays.filter((d) => d !== day));
-  } else {
-    setSelectedDays([...selectedDays, day]);
-  }
-  AsyncStorage.setItem('selectedDays', JSON.stringify(selectedDays));
+  // Aktualisiert die ausgewählten Tage und speichert sie in AsyncStorage
+  const handleDayPress = (day) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(selectedDays.filter((d) => d !== day));
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
+    AsyncStorage.setItem('selectedDays', JSON.stringify(selectedDays));
+  };
+
+  return (
+    <ImageBackground source={require('./bg.jpg')} style={styles.bg}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Parkplatz-Verlosung</Text>
+        <Text style={styles.countdown}>
+          {countdown > 0 ? `${Math.floor(countdown / 86400)}:${Math.floor((countdown%86400) / 3600)}:${Math.floor(
+            (countdown % 3600) / 60
+          )}:${countdown % 60}` : 'Countdown beendet'}
+        </Text>
+        <View style={styles.daysContainer}>
+          {['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag'].map((day) => (
+            <TouchableOpacity
+              key={day}
+              style={[styles.button, selectedDays.includes(day) && styles.selectedDayButton]}
+              onPress={() => handleDayPress(day)}
+            >
+              <Text style={[styles.buttonText, selectedDays.includes(day) && styles.selectedDayButtonText]}>
+                {day}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    </ImageBackground>
+  );
 };
 
-return (
-  <ImageBackground source={require('./bg.jpg')} style={styles.bg}>
-    <View style={styles.container}>
-      <Text style={styles.title}>Parkplatz-Verlosung</Text>
-      <Text style={styles.countdown}>
-        {countdown > 0 ? `${Math.floor(countdown / 86400)}:${Math.floor((countdown%86400) / 3600)}:${Math.floor(
-          (countdown % 3600) / 60
-        )}:${countdown % 60}` : 'Countdown beendet'}
-      </Text>
-      <View style={styles.buttonContainer}>
-        <Button
-          title="Montag"
-          onPress={() => handleDayPress('Montag')}
-          color={selectedDays.includes('Montag') ? 'green' : 'gray'}
-        />
-        <Button
-          title="Dienstag"
-          onPress={() => handleDayPress('Dienstag')}
-          color={selectedDays.includes('Dienstag') ? 'green' : 'gray'}
-        />
-        <Button
-          title="Mittwoch"
-          onPress={() => handleDayPress('Mittwoch')}
-          color={selectedDays.includes('Mittwoch') ? 'green' : 'gray'}
-        />
-        <Button
-          title="Donnerstag"
-          onPress={() => handleDayPress('Donnerstag')}
-          color={selectedDays.includes('Donnerstag') ? 'green' : 'gray'}
-        />
-        <Button
-          title="Freitag"
-          onPress={() => handleDayPress('Freitag')}
-          color={selectedDays.includes('Freitag') ? 'green' : 'gray'}
-        />
-      </View>
-    </View>
-  </ImageBackground>
-);
-};
 
 const styles = StyleSheet.create({
-bg: {
+  bg: {
   flex: 1,
   resizeMode: 'cover',
   alignItems: 'center',
-},
-container: {
+  },
+  container: {
   flex: 1,
   alignItems: 'center',
   justifyContent: 'center',
-},
-title: {
+  },
+  title: {
   fontSize: 40,
   fontWeight: 'bold',
   marginBottom: 16,
   color: '#768A99',
-},
-countdown: {
+  },
+  countdown: {
   fontSize: 48,
   marginBottom: 16,
   fontWeight: 'bold',
   color: '#768A99',
-},
-buttonContainer: {
-  flexDirection: 'column', // Buttons sollen in Spalten angeordnet sein
+  },
+  daysContainer: {
+  flexDirection: 'column', // Buttons sollen in Zeilen angeordnet sein
   justifyContent: 'space-around',
   marginBottom: 16,
-},
-dayButton: {
-  width: 200, // Breite des Buttons erhöhen
-  height: 50,
-  borderRadius: 25,
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: '#fff',
-  marginBottom: 10, // Abstand zwischen Buttons erhöhen
-},
-dayButtonText: {
+  },
+  button: {
+  backgroundColor: 'grey',
+  padding: 10,
+  borderRadius: 10,
+  marginVertical: 10,
+  },
+  buttonText: {
   fontSize: 20,
-  fontWeight: 'bold',
-  color: '#768A99',
-},
-selectedDayButton: {
-  backgroundColor: '#8BC34A',
   color: '#fff',
-},
-selectedDayButtonText: {
+  },
+  selectedDayButton: {
+  backgroundColor: 'green',
+  },
+  selectedDayButtonText: {
   color: '#fff',
-},
-});
-
-  
+  },
+  });
 export default ParkplatzAuswahl;

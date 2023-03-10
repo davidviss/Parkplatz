@@ -21,11 +21,15 @@ const ResultScreen = () => {
   const numCols = daysOfWeek.length;
 
   const styles = StyleSheet.create({
+    bg: {
+      flex: 1,
+      resizeMode: 'cover',
+      alignItems: 'center',
+      },
     
     container: {
       flex: 1,
       padding: 16,
-      backgroundColor: '#fff',
     },
     title: {
       fontWeight: 'bold',
@@ -34,7 +38,7 @@ const ResultScreen = () => {
     },
     tableHeader: {
       height: 40,
-      backgroundColor: '#f1f8ff',
+ 
     },
     tableHeaderText: {
       margin: 6,
@@ -50,13 +54,11 @@ const ResultScreen = () => {
     },
     tableContainer: {
         marginBottom: 4,
-        backgroundColor: '#fff',
         borderRadius: 10,
         overflow: 'hidden',
       },
     namesContainer: {
       marginTop: 32,
-      backgroundColor: '#fff',
       padding: 8,
       borderRadius: 10,
     },
@@ -76,7 +78,8 @@ const ResultScreen = () => {
   const tableData2 = tableData.map(row => row.slice(3));
 
   return (
-    
+    <ImageBackground source={require('./bg.jpg')} style={styles.backgroundImage}>
+    <ScrollView>
     <View style={styles.container}>
       <View style={styles.tableContainer}>
         <Text style={styles.namesTitle}>Montag bis Mittwoch</Text>
@@ -97,7 +100,8 @@ const ResultScreen = () => {
         </Table>
       </View>
     </View>
-    
+    </ScrollView>
+    </ImageBackground>
   );
 };
 

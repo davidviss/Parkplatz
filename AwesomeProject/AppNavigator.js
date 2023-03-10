@@ -3,6 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import LoginScreen from './LoginScreen';
 import HomeScreen from './HomeScreen';
 import WeekScreen from './WeekScreen';
+import ResultScreen from './ResultScreen';
 
 const Stack = createStackNavigator();
 
@@ -15,11 +16,12 @@ const AppNavigator = () => (
       },
       headerTintColor: '#fff',
       headerTitleStyle: {
-        fontWeight: 'normal',
+        fontWeight: 'bolt',
       },
     }}>
     <Stack.Screen name="Login" component={LoginScreen} />
     <Stack.Screen name="Home" component={HomeScreen} />
+    <Stack.Screen name="Übersicht" component={ResultScreen}/>
     <Stack.Screen name="Countdown" component={WeekScreen} />
   </Stack.Navigator>
 );

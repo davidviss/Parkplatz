@@ -39,7 +39,7 @@ const LoginScreen = () => {
   // function to handle the login process
   const handleLogin = () => {
     // Perform login logic here, such as checking the username and password against a backend API
-    if (username === 'admin' && password === 'password') {
+    if (username === 'a' && password === 'p') {
       // If the login is successful, navigate to the next screen
       navigation.navigate('Home');
     } else {

@@ -1,116 +1,142 @@
-import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  LayoutAnimation,
-  ImageBackground,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Button, AsyncStorage,ImageBackground } from 'react-native';
 
-const CountdownScreen = () => {
-  // Declare a state variable for the countdown date
-  const [countdownDate, setCountdownDate] = useState(
-    new Date('2022-12-19T11:00:00'),
-  );
+const getNextFridayNoon = () => {
+  const now = new Date();
+  const friday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + (5 - now.getDay()) % 7 , 11, 0, 0);
+  if (friday <= now) {
+    friday.setDate(friday.getDate() + 7);
+  }
+  return friday;
+};
 
-  // Declare a state variable for the current time
-  const [currentTime, setCurrentTime] = useState(new Date());
+const COUNTDOWN_TARGET = getNextFridayNoon(); // Nächstes Freitag mittag
 
-  // Declare a state variable for the time remaining until the countdown date
-  const [timeRemaining, setTimeRemaining] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+const ParkplatzAuswahl = () => {
+  const [countdown, setCountdown] = useState(0); // Countdown in Sekunden
+  const [selectedDays, setSelectedDays] = useState([]); // ausgewählte Tage
 
-  // Use an effect hook to update the current time and time remaining every second
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-      setTimeRemaining({
-        days: Math.floor((countdownDate - currentTime) / (1000 * 60 * 60 * 24)),
-        hours: Math.floor(
-          ((countdownDate - currentTime) / (1000 * 60 * 60)) % 24,
-        ),
-        minutes: Math.floor(((countdownDate - currentTime) / (1000 * 60)) % 60),
-        seconds: Math.floor(((countdownDate - currentTime) / 1000) % 60),
+    // Lädt die ausgewählten Tage aus AsyncStorage beim Starten der App
+    useEffect(() => {
+      AsyncStorage.getItem('selectedDays').then((data) => {
+        if (data) {
+          setSelectedDays(JSON.parse(data));
+        }
       });
+    }, []);
+
+  // Aktualisiert den Countdown in Sekunden
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const now = new Date();
+      const difference = COUNTDOWN_TARGET - now;
+      const seconds = Math.floor(difference / 1000);
+      setCountdown(seconds);
     }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [currentTime, countdownDate]);
+// Aktualisiert die ausgewählten Tage und speichert sie in AsyncStorage
+const handleDayPress = (day) => {
+  if (selectedDays.includes(day)) {
+    setSelectedDays(selectedDays.filter((d) => d !== day));
+  } else {
+    setSelectedDays([...selectedDays, day]);
+  }
+  AsyncStorage.setItem('selectedDays', JSON.stringify(selectedDays));
+};
 
-  // Function to handle pressing a box
-  const handlePress = index => {
-    // Use LayoutAnimation to smoothly animate the box being pressed
-    LayoutAnimation.spring();
-
-    // TODO: Add logic for handling the box press here
-  };
-
-  return (
-    <ImageBackground source={require('./bg.jpg')} style={styles.bg}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Countdown</Text>
-        <Text style={styles.countdown}>
-          {timeRemaining.days} days {timeRemaining.hours} hours{' '}
-          {timeRemaining.minutes} minutes {timeRemaining.seconds} seconds
-        </Text>
-        <View style={styles.grid}>
-          {[...Array(11)].map((_, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.box}
-              onPress={() => handlePress(index)}>
-              <Text style={styles.boxText}>{index + 1}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+return (
+  <ImageBackground source={require('./bg.jpg')} style={styles.bg}>
+    <View style={styles.container}>
+      <Text style={styles.title}>Parkplatz-Verlosung</Text>
+      <Text style={styles.countdown}>
+        {countdown > 0 ? `${Math.floor(countdown / 86400)}:${Math.floor((countdown%86400) / 3600)}:${Math.floor(
+          (countdown % 3600) / 60
+        )}:${countdown % 60}` : 'Countdown beendet'}
+      </Text>
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Montag"
+          onPress={() => handleDayPress('Montag')}
+          color={selectedDays.includes('Montag') ? 'green' : 'gray'}
+        />
+        <Button
+          title="Dienstag"
+          onPress={() => handleDayPress('Dienstag')}
+          color={selectedDays.includes('Dienstag') ? 'green' : 'gray'}
+        />
+        <Button
+          title="Mittwoch"
+          onPress={() => handleDayPress('Mittwoch')}
+          color={selectedDays.includes('Mittwoch') ? 'green' : 'gray'}
+        />
+        <Button
+          title="Donnerstag"
+          onPress={() => handleDayPress('Donnerstag')}
+          color={selectedDays.includes('Donnerstag') ? 'green' : 'gray'}
+        />
+        <Button
+          title="Freitag"
+          onPress={() => handleDayPress('Freitag')}
+          color={selectedDays.includes('Freitag') ? 'green' : 'gray'}
+        />
       </View>
-    </ImageBackground>
-  );
+    </View>
+  </ImageBackground>
+);
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  bg: {
-    flex: 1,
-    resizeMode: 'cover',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  countdown: {
-    fontSize: 24,
-    marginBottom: 32,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '100%',
-  },
-  box: {
-    width: '25%',
-    aspectRatio: 1,
-    backgroundColor: '#80B6C4',
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    margin: 8,
-  },
-  boxText: {
-    color: '#fff',
-    fontSize: 24,
-  },
+bg: {
+  flex: 1,
+  resizeMode: 'cover',
+  alignItems: 'center',
+},
+container: {
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+title: {
+  fontSize: 40,
+  fontWeight: 'bold',
+  marginBottom: 16,
+  color: '#768A99',
+},
+countdown: {
+  fontSize: 48,
+  marginBottom: 16,
+  fontWeight: 'bold',
+  color: '#768A99',
+},
+buttonContainer: {
+  flexDirection: 'column', // Buttons sollen in Spalten angeordnet sein
+  justifyContent: 'space-around',
+  marginBottom: 16,
+},
+dayButton: {
+  width: 200, // Breite des Buttons erhöhen
+  height: 50,
+  borderRadius: 25,
+  justifyContent: 'center',
+  alignItems: 'center',
+  backgroundColor: '#fff',
+  marginBottom: 10, // Abstand zwischen Buttons erhöhen
+},
+dayButtonText: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  color: '#768A99',
+},
+selectedDayButton: {
+  backgroundColor: '#8BC34A',
+  color: '#fff',
+},
+selectedDayButtonText: {
+  color: '#fff',
+},
 });
 
-export default CountdownScreen;
+  
+export default ParkplatzAuswahl;

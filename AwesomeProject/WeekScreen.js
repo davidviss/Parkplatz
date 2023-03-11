@@ -1,5 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, AsyncStorage, ImageBackground } from 'react-native';
 import {useState, useEffect} from 'react';
+import { getDatabase, ref, set, onValue } from 'firebase/database';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const getNextFridayNoon = () => {
   const now = new Date();
@@ -15,15 +17,39 @@ const COUNTDOWN_TARGET = getNextFridayNoon(); // Nächstes Freitag mittag
 const ParkplatzAuswahl = () => {
   const [countdown, setCountdown] = useState(0); // Countdown in Sekunden
   const [selectedDays, setSelectedDays] = useState([]); // ausgewählte Tage
+  const [user, setUser] = useState(null); // aktueller Benutzer
 
-  // Lädt die ausgewählten Tage aus AsyncStorage beim Starten der App
+  const auth = getAuth();
+  const db = getDatabase();
+
   useEffect(() => {
-    AsyncStorage.getItem('selectedDays').then((data) => {
+    // Listener für den Auth-Status des Benutzers
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Listener für die ausgewählten Tage des Benutzers
+    if (!user) return;
+
+    const userDaysRef = ref(db, `users/${user.uid}/selectedDays`);
+    onValue(userDaysRef, (snapshot) => {
+      const data = snapshot.val();
       if (data) {
-        setSelectedDays(JSON.parse(data));
+        setSelectedDays(data);
       }
     });
-  }, []);
+
+    return () => {
+      // clean up function
+      userDaysRef.off('value');
+    };
+  }, [user]);
 
   // Aktualisiert den Countdown in Sekunden
   useEffect(() => {
@@ -36,14 +62,20 @@ const ParkplatzAuswahl = () => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Aktualisiert die ausgewählten Tage und speichert sie in AsyncStorage
+  // Aktualisiert die ausgewählten Tage und speichert sie in Firebase Realtime Database
   const handleDayPress = (day) => {
     if (selectedDays.includes(day)) {
       setSelectedDays(selectedDays.filter((d) => d !== day));
     } else {
       setSelectedDays([...selectedDays, day]);
     }
-    AsyncStorage.setItem('selectedDays', JSON.stringify(selectedDays));
+
+    if (user) {
+      // Speichert die ausgewählten Tage des Benutzers in der Firebase-Datenbank
+      const db = getDatabase();
+      const userDaysRef = ref(db, `users/${user.uid}/selectedDays`);
+      set(userDaysRef, selectedDays);
+    }
   };
 
   return (

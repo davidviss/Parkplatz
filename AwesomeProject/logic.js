@@ -40,4 +40,4 @@ export const generateSchedule= (attendees) =>{
     // Rückgabe der Tabelle als 2D-Array
     return tableData;
   };
-  
+   

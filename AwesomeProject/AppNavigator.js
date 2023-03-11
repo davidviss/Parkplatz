@@ -1,6 +1,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import LoginScreen from './LoginScreen';
+import RegisterScreen from './RegisterScreen';
 import HomeScreen from './HomeScreen';
 import WeekScreen from './WeekScreen';
 import ResultScreen from './ResultScreen';
@@ -21,6 +22,7 @@ const AppNavigator = () => (
       },
     }}>
     <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Screen name="Register" component={RegisterScreen} />
     <Stack.Screen name="Home" component={HomeScreen} />
     <Stack.Screen name="Übersicht" component={ResultScreen}/>
     <Stack.Screen name="Countdown" component={WeekScreen} />

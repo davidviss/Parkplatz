@@ -11,8 +11,7 @@ import {
   ImageBackground,
   Alert,
 } from 'react-native';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
+import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import {useNavigation} from '@react-navigation/native';
 
 const LoginScreen = () => {
@@ -60,6 +59,32 @@ const LoginScreen = () => {
     animateButton();
   };
 
+  function handleForgotPassword(event) {
+    event.preventDefault()
+    Alert.alert(
+      '',
+      'Are you sure you want to reset your password?',  
+      [
+         {text: 'Ja', onPress: () => 
+         {const auth = getAuth()
+          const email = username.trim();
+          sendPasswordResetEmail(auth, email)
+            .then(() => {
+              alert("Password reset email sent.")
+            })
+            .catch((error) => {
+              console.error(error)
+              alert(error.message)
+            })},
+             style: 'cancel'
+        },
+         {text: 'Abbrechen', onPress: () => console.log('Abbrechen pressed')},
+      ],
+      { cancelable: false }
+ )
+    
+  }
+
   useFocusEffect(
     React.useCallback(() => {
       // Clear the password state when the screen comes into focus
@@ -103,10 +128,13 @@ const LoginScreen = () => {
         <View style={styles.checkboxContainer}>
           <CheckBox
             value={rememberPassword}
-            onValueChange={setRememberPassword}
+            onValueChange={(value) => setRememberPassword(value)}
             style={styles.checkbox}
           />
           <Text style={styles.label}>Remember me</Text>
+          <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+            <Text style={styles.label}>Forgot Password?</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
@@ -160,9 +188,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: 'center',
     marginBottom: 16,
+    marginTop: 4,
+    
   },
   checkbox: {
     alignSelf: "center",
+  },
+  forgotPassword: {
+    flexDirection: "row",
+    alignItems: 'center',
+    marginLeft: 30,
+  },
+  forgotPasswordText: {
+    color: '#A8CCCB',
+    fontSize: 16,
   },
 });
 

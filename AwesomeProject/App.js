@@ -1,18 +1,30 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import AppNavigator from './AppNavigator';
-import {initializeApp} from 'firebase/app';
+// Import the functions you need from the SDKs you need
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDdX2WfK-bwpvPJoOaU-_90wWZuiClXhns",
-  appId: "1:974662845460:android:aeaf331b9436db166b1301",
+  apiKey: "AIzaSyCI72Iv1kBmwexDojFVwRXi_7ppJKrgXDM",
+  authDomain: "parkplatz-8fcda.firebaseapp.com",
+  databaseURL: "https://parkplatz-8fcda-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "parkplatz-8fcda",
   storageBucket: "parkplatz-8fcda.appspot.com",
-  databaseURL: "https://parkplatz-8fcda-default-rtdb.europe-west1.firebaseio.com",
-  authDomain: "parkplatz-8fcda.firebaseapp.com",
-  senderId: 974662845460
-}
-firebase.initializeApp(firebaseConfig);
+  messagingSenderId: "974662845460",
+  appId: "1:974662845460:web:c42c82addc9961266b1301",
+  measurementId: "G-L1QH5E9S20"
+};
+
+// Initialize Firebase
+const ap = initializeApp(firebaseConfig);
+const analytics = getAnalytics(ap);
+
+getApps().length === 0 ? initializeApp(firebaseConfig) : console.log("Initialized");
 
 const App = () => (
   <NavigationContainer>

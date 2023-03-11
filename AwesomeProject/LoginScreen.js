@@ -1,4 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import CheckBox from '@react-native-community/checkbox';
 import {
   View,
   Text,
@@ -9,8 +11,7 @@ import {
   ImageBackground,
   Alert,
 } from 'react-native';
-import firebase from 'firebase/app';
-import 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 import {useNavigation} from '@react-navigation/native';
 
@@ -18,6 +19,7 @@ const LoginScreen = () => {
   // state variables to store the login form values
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberPassword, setRememberPassword] = useState(false);
   const navigation = useNavigation();
 
   // animation value for the login button
@@ -40,21 +42,35 @@ const LoginScreen = () => {
 
   // function to handle the login process
   const handleLogin = () => {
-    firebase.auth().signInWithEmailAndPassword(email, password)
-  .then((userCredential) => {
-    // Signed in successfully
-    const user = userCredential.user;
-    navigation.navigate('Home');
-  })
-  .catch((error) => {
-    // Handle errors
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    Alert.alert('Error', 'Invalid username or password');
-  });
-  // animate the login button
-  animateButton();
+    const auth = getAuth();
+    const trimmedUsername = username.trim();
+    signInWithEmailAndPassword(auth, trimmedUsername, password)
+      .then((userCredential) => {
+        // Signed in successfully
+        const user = userCredential.user;
+        navigation.navigate('Home');
+      })
+      .catch((error) => {
+        // Handle errors
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        Alert.alert('Error', 'Invalid username or password');
+      });
+    // animate the login button
+    animateButton();
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Clear the password state when the screen comes into focus
+      setPassword('');
+      if (rememberPassword) {
+        // retrieve the password from local storage and set it to the password state
+        // you can implement this using AsyncStorage or some other storage mechanism
+      }
+      return () => {};
+    }, [rememberPassword])
+  );
 
   return (
     <ImageBackground source={require('./bg.jpg')} style={styles.bg}>
@@ -64,7 +80,7 @@ const LoginScreen = () => {
           style={styles.input}
           value={username}
           onChangeText={text => setUsername(text)}
-          placeholder="Username"
+          placeholder="Email"
           borderRadius={20}
         />
         <TextInput
@@ -84,6 +100,14 @@ const LoginScreen = () => {
             <Text style={styles.buttonText}>Log In</Text>
           </Animated.View>
         </TouchableOpacity>
+        <View style={styles.checkboxContainer}>
+          <CheckBox
+            value={rememberPassword}
+            onValueChange={setRememberPassword}
+            style={styles.checkbox}
+          />
+          <Text style={styles.label}>Remember me</Text>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -131,6 +155,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '500',
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  checkbox: {
+    alignSelf: "center",
   },
 });
 

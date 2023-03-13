@@ -36,18 +36,22 @@ const ParkplatzAuswahl = () => {
   useEffect(() => {
     // Listener für die ausgewählten Tage des Benutzers
     if (!user) return;
-
+  
+    const db = getDatabase();
     const userDaysRef = ref(db, `users/${user.uid}/selectedDays`);
+  
     onValue(userDaysRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
         setSelectedDays(data);
       }
     });
-
+  
     return () => {
       // clean up function
-      userDaysRef.off('value');
+      if (userDaysRef) {
+        userDaysRef.off('value');
+      }
     };
   }, [user]);
 
@@ -64,17 +68,20 @@ const ParkplatzAuswahl = () => {
 
   // Aktualisiert die ausgewählten Tage und speichert sie in Firebase Realtime Database
   const handleDayPress = (day) => {
+    let newSelectedDays;
     if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter((d) => d !== day));
+      newSelectedDays = selectedDays.filter((d) => d !== day);
     } else {
-      setSelectedDays([...selectedDays, day]);
+      newSelectedDays = [...selectedDays, day];
     }
-
+  
+    setSelectedDays(newSelectedDays);
+  
     if (user) {
       // Speichert die ausgewählten Tage des Benutzers in der Firebase-Datenbank
       const db = getDatabase();
       const userDaysRef = ref(db, `users/${user.uid}/selectedDays`);
-      set(userDaysRef, selectedDays);
+      set(userDaysRef, newSelectedDays);
     }
   };
 

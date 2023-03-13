@@ -5,6 +5,37 @@ import HomeScreen from './HomeScreen';
 import WeekScreen from './WeekScreen';
 import ResultScreen from './ResultScreen';
 import AustragenScreen from './AustragenScreen'
+/*
+import { getDatabase, ref, set } from "firebase/database";
+import { getAuth, listUsers } from "firebase/auth";
+
+// Initialize Firebase
+const db = getDatabase();
+const auth = getAuth();
+
+// Retrieve all users from Firebase Authentication
+listUsers(auth)
+  .then((userRecords) => {
+    // Loop through all user records
+    userRecords.forEach((userRecord) => {
+      const userId = userRecord.uid;
+      const userEmail = userRecord.email;
+
+      // Create a new child node for the user with the email and probability value set to 1
+      const userDaysRef = ref(db, 'users/' + userId);
+      set(userDaysRef, { email: userEmail, probability: 1 })
+        .then(() => {
+          console.log(`User with ID ${userId} added to the database`);
+        })
+        .catch((error) => {
+          console.error(`Error adding user with ID ${userId} to the database:`, error);
+        });
+    });
+  })
+  .catch((error) => {
+    console.error('Error listing users:', error);
+  });
+*/
 
 const Stack = createStackNavigator();
 

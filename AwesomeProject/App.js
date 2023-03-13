@@ -4,6 +4,8 @@ import AppNavigator from './AppNavigator';
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getDatabase, ref, child, get } from "firebase/database";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -25,6 +27,8 @@ const ap = initializeApp(firebaseConfig);
 const analytics = getAnalytics(ap);
 
 getApps().length === 0 ? initializeApp(firebaseConfig) : console.log("Initialized");
+
+const db = getDatabase();
 
 const App = () => (
   <NavigationContainer>
